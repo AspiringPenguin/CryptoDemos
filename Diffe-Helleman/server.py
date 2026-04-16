@@ -1,0 +1,60 @@
+from random import randint
+import socket
+from socketWrapper import SocketWrapper
+
+prime = 2134879 #For the modulus
+g = 6 #The base, a primitive root in Z{prime}
+msgLEN = 16384
+
+class Server:
+    port : int
+    a : int
+    keyTable = list[int]()
+    idNum = -1 #Is incremented before use
+
+    def __init__(self, port : int):
+        self.port = port
+        self.a = randint(2, prime - 2)
+    
+    def connectNew(self):
+        self.idNum += 1
+        return f"""id {self.idNum}
+p {prime}
+g {g}
+c {(g ** self.a) % prime}"""
+
+    def handleSocket(self, clientSocket : socket.socket):
+        sock = SocketWrapper(msgLEN, sock = clientSocket)
+
+        msg = sock.receive()
+
+        if msg == "new":
+            sock.send(self.connectNew())
+
+            print(f"Got a new client. ID {self.idNum}")
+
+            dContainer = sock.receive()
+
+            d = int(dContainer.split(" ")[-1])
+
+            self.keyTable.append((d ** self.a) % prime)
+
+            print("Finished handshake.")
+
+            return
+
+        #Grab the id and message, pass them on
+
+    def mainloop(self):
+        serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        
+        #Bind socket
+        serversocket.bind(("localhost", self.port))
+        
+        # become a server socket
+        serversocket.listen(1)
+
+        while True:
+            (clientSocket, _) = serversocket.accept()
+
+            self.handleSocket(clientSocket)
