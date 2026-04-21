@@ -36,6 +36,8 @@ c {(g ** self.a) % prime}"""
 
             dContainer = sock.receive()
 
+            sock.close()
+
             d = int(dContainer.split(" ")[-1])
 
             self.keyTable.append((d ** self.a) % prime)
@@ -46,6 +48,7 @@ c {(g ** self.a) % prime}"""
 
         #Grab the id and encrypted message, pass them on
         if msg.startswith("id"):
+            sock.close()
             lines = msg.split("\n")
             self.handleEncrypted(int(lines[0][2:].strip()), "\n".join(lines[1:]))
 

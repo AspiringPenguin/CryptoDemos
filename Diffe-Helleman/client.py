@@ -69,3 +69,4 @@ class Client:
             s.connect("localhost", self.port)
             s.send(f"id {self._id}\n{encrypted}")
             print("Sent")
+            s.close()
