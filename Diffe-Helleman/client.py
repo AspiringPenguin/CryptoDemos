@@ -39,7 +39,7 @@ class Client:
         print("Received server response")
 
         #Send back d
-        s.send(f"d {(self.root ** self.b) % self.prime}")
+        s.send(f"d {pow(self.root, self.b, self.prime)}")
 
         s.close()
 
@@ -47,10 +47,10 @@ class Client:
 
     def encrypt(self, message : str) -> str:
         encrypted = ""
-        n = 0
+        n = 10
         
         for char in message:
-            encrypted += chr((ord(char) + ((n**self.secureKey) % self.prime)) % 256)
+            encrypted += chr((ord(char) + (pow(n, self.secureKey, self.prime)) % 256))
             n += 1
 
         return encrypted

@@ -40,7 +40,7 @@ c {(g ** self.a) % prime}"""
 
             d = int(dContainer.split(" ")[-1])
 
-            self.keyTable.append((d ** self.a) % prime)
+            self.keyTable.append(pow(d, self.a, prime))
 
             print("Finished handshake.")
 
@@ -53,14 +53,17 @@ c {(g ** self.a) % prime}"""
             self.handleEncrypted(int(lines[0][2:].strip()), "\n".join(lines[1:]))
 
     def handleEncrypted(self, _id:int, message : str):
+        print(f"New message from id {_id}.")
+
         decrypted = ""
-        n = 0
+        n = 10
         
         for char in message:
-            decrypted += chr((ord(char) - ((n**self.keyTable[_id]) % prime)) % 256)
+            num = ord(char) - ((pow(n, self.keyTable[_id], prime))) % 256
+            if (num < 0): num += 256
+            decrypted += chr(num)
             n += 1
 
-        print(f"New message from id {_id}.")
         print(decrypted)
 
     def mainloop(self):
