@@ -45,7 +45,27 @@ class Client:
 
         print("Finished handshake")
 
-    def mainloop(self):
-        inp = input("> ")
+    def encrypt(self, message : str) -> str:
+        encrypted = ""
+        n = 0
+        
+        for char in message:
+            encrypted += chr((ord(char) + ((n**self.secureKey) % self.prime)) % 256)
+            n += 1
 
-        print(inp)
+        return encrypted
+
+    def mainloop(self):
+        while True:
+            inp = input("> ")
+
+            if inp.strip() == "quit":
+                break
+
+            print("Encrypting..")
+            encrypted = self.encrypt(inp)
+            print("Encrypted. Sending...")
+            s = SocketWrapper(msgLEN)
+            s.connect("localhost", self.port)
+            s.send(f"id {self._id}\n{encrypted}")
+            print("Sent")

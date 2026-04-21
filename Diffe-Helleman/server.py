@@ -28,6 +28,7 @@ c {(g ** self.a) % prime}"""
 
         msg = sock.receive()
 
+        #Handle new unencrypted connections
         if msg == "new":
             sock.send(self.connectNew())
 
@@ -43,7 +44,21 @@ c {(g ** self.a) % prime}"""
 
             return
 
-        #Grab the id and message, pass them on
+        #Grab the id and encrypted message, pass them on
+        if msg.startswith("id"):
+            lines = msg.split("\n")
+            self.handleEncrypted(int(lines[0][2:].strip()), "\n".join(lines[1:]))
+
+    def handleEncrypted(self, _id:int, message : str):
+        decrypted = ""
+        n = 0
+        
+        for char in message:
+            decrypted += chr((ord(char) - ((n**self.keyTable[_id]) % prime)) % 256)
+            n += 1
+
+        print(f"New message from id {_id}.")
+        print(decrypted)
 
     def mainloop(self):
         serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
